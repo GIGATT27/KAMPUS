@@ -1,0 +1,497 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+
+
+<!-- modal.html  21 Nov 2019 03:54:30 GMT -->
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
+  <title>UniVerse - HOME</title>
+  <!-- General CSS Files -->
+  <link rel="stylesheet" href="{% static 'assets/css/app.min.css' %}">
+  <link rel="stylesheet" href="{% static 'assets/bundles/prism/prism.css' %}">
+  <link rel="stylesheet" href="{% static 'assets/bundles/ionicons/css/ionicons.min.css' %}">
+  <!-- Template CSS -->
+  <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'assets/css/components.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-9J/9IUfV7xuL1Q8N7HnJL5+5fz6DZQ2c+X9Hv0nOTyJL4y+4w1aMO4pndJZ1h6Zp0zUJX+UvQ6JLxqy3I8bHw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Custom style CSS -->
+  <link rel="stylesheet" href="{% static 'assets/css/custom.css' %}">
+  <link rel='shortcut icon' type='image/x-icon' href="{% static 'assets/img/favicon.ico' %}"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-0oXWqDvGnKP3YBf3q3qzjsQ8wvGwJjRl7yB5WfX8r5g5h5jf5F5A5WxL8wvB5yFtCjlzJj/0F9E6SgNzwuZ7Vg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" crossorigin="anonymous" />
+
+  <style>
+    #fixed-section{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: auto;
+        z-index: 9999;
+    }
+  </style>
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).on('click', '#like-button', function(event) {
+event.preventDefault();
+var like_button = $(this);
+var like_count = $(this).siblings('.like-count');
+var action = 'like';
+var post_id = $(this).closest('.like-form').data('post-id');
+if ($(this).hasClass('liked')) {
+    action = 'unlike';
+}
+$.ajax({
+    url: "/like_post/" + post_id + "/",
+    type: "POST",
+    data: {
+        'action': action,
+        'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val()
+    },
+    dataType: "json",
+    success: function(data) {
+        if (data['success']) {
+            like_count.text(data['like_count']);
+            if (data['already_liked']) {
+                like_button.addClass('liked');
+                like_button.html('<i class="fas fa-heart" style="color: #F44336;"></i>');
+            } else {
+                like_button.removeClass('liked');
+                like_button.html('<i class="far fa-heart"></i>');
+            }
+        }
+    }
+});
+});
+</script>
+{% endblock %}
+
+
+</head>
+
+<body>
+  <div class="loader"></div>
+  <div id="app">
+    <div class="main-wrapper main-wrapper-1">
+      <div class="navbar-bg"></div>
+      <nav class="navbar navbar-expand-lg main-navbar sticky">
+        
+        <div class="form-inline mr-auto">
+          <ul class="navbar-nav mr-3">
+            <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg
+									collapse-btn"> <i data-feather="align-justify"></i></a></li>
+            <li><a href="#" class="nav-link nav-link-lg fullscreen-btn">
+                <i data-feather="maximize"></i>
+              </a></li>
+            <li>
+              <form class="form-inline mr-auto" action="" method="GET">
+                
+                <div class="search-element">
+                  <input class="form-control" name="q" type="search" placeholder="Search" aria-label="Search" data-width="200">
+                  <button class="btn" type="submit">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
+              </form>
+            </li>
+          </ul>
+        </div>
+       
+        <ul class="navbar-nav navbar-right">
+          <li class="dropdown dropdown-list-toggle">
+            <a href="" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal"><i></i><span style="color: violet ;"><strong>Post</strong></span></a>
+          </li>
+
+          <li class="dropdown"><a href="#" data-toggle="dropdown"
+              class="nav-link dropdown-toggle nav-link-lg nav-link-user"> 
+              <img width="25" height="40" alt="image" src="{{ profile.profileimg.url }}"
+                class="user-img-radious-style"> <span class="d-sm-none d-lg-inline-block"></span></a>
+            <div class="dropdown-menu dropdown-menu-right pullDown">
+              <div class="dropdown-title">Hello {{ user.username }}</div>
+              <a href="{% url 'Post:profile' user.username %}" class="dropdown-item has-icon"> <i class="far
+										fa-user"></i> Profile
+              </a> <a href="timeline.html" class="dropdown-item has-icon"> <i class="fas fa-bolt"></i>
+                Activities
+              </a> <a href="{% url 'Post:settings' %}" class="dropdown-item has-icon"> <i class="fas fa-cog"></i>
+                Settings
+              </a>
+              <div class="dropdown-divider"></div>
+              <a href="{% url 'Users:signout' %}" class="dropdown-item has-icon text-danger"> <i class="fas fa-sign-out-alt"></i>
+                Logout
+              </a>
+            </div>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="main-sidebar sidebar-style-2">
+        <aside id="sidebar-wrapper">
+          <div class="sidebar-brand">
+            <a href="{% url 'Post:home' %}"> <img alt="" src="" class="header-logo" /><i data-feather="book" style="color: violet;"></i> <span
+              class="logo-name" style="color: violet;">UniVerse</span>
+          </a>
+          </div>
+          <ul class="sidebar-menu">
+            <li class="menu-header" style="color: violet;">@{{ user.username }}</li>
+            <li class="dropdown">
+              <a href="" class="nav-link"><i data-feather="monitor"></i><span>Home</span></a>
+            </li>
+            <li class="dropdown">
+              <a href="{% url 'Groups:group_home' %}" class=""><i
+                  data-feather="users"></i><span>Groups/Communities</span></a>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="command"></i><span>NewsFeeds</span></a>
+              <ul class="dropdown-menu">
+                <li><a class="nav-link" href="chat.html">Chat</a></li>
+                <li><a class="nav-link" href="portfolio.html">Portfolio</a></li>
+                <li><a class="nav-link" href="blog.html">Blog</a></li>
+                <li><a class="nav-link" href="calendar.html">Calendar</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="mail"></i><span>Email</span></a>
+              <ul class="dropdown-menu">
+                <li><a class="nav-link" href="email-inbox.html">Inbox</a></li>
+                <li><a class="nav-link" href="email-compose.html">Compose</a></li>
+                <li><a class="nav-link" href="email-read.html">read</a></li>
+              </ul>
+            </li>
+            <li class="menu-header">UI Elements</li>
+            <li class="dropdown">
+              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="copy"></i><span>Basic
+                  Components</span></a>
+              <ul class="dropdown-menu">
+                <li><a class="nav-link" href="alert.html">Alert</a></li>
+                <li><a class="nav-link" href="badge.html">Badge</a></li>
+                <li><a class="nav-link" href="breadcrumb.html">Breadcrumb</a></li>
+                <li><a class="nav-link" href="buttons.html">Buttons</a></li>
+                <li><a class="nav-link" href="collapse.html">Collapse</a></li>
+                <li><a class="nav-link" href="dropdown.html">Dropdown</a></li>
+                <li><a class="nav-link" href="checkbox-and-radio.html">Checkbox &amp; Radios</a></li>
+                <li><a class="nav-link" href="list-group.html">List Group</a></li>
+                <li><a class="nav-link" href="media-object.html">Media Object</a></li>
+                <li><a class="nav-link" href="navbar.html">Navbar</a></li>
+                <li><a class="nav-link" href="pagination.html">Pagination</a></li>
+                <li><a class="nav-link" href="popover.html">Popover</a></li>
+                <li><a class="nav-link" href="progress.html">Progress</a></li>
+                <li><a class="nav-link" href="tooltip.html">Tooltip</a></li>
+                <li><a class="nav-link" href="flags.html">Flag</a></li>
+                <li><a class="nav-link" href="typography.html">Typography</a></li>
+              </ul>
+            </li>
+            
+            
+          </ul>
+        </aside>
+      </div>
+      <!-- Main Content -->
+      <div class="main-content" style="margin-top: -10px;">
+        <section class="section">
+
+          {% for post in posts %}
+          <a href="{% url 'Post:post_detail' pk=post.pk %}">
+          <div id="post-{{ post.id }}" class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+          <div class="card" style="width: 100%; height: 100%; margin-bottom: 20px;">
+            <a href="{% url 'Post:post_detail' pk=post.pk %}">
+            <div class="chat">
+              <div class="chat-header clearfix" style="font-size: 20px; padding: 8px;">
+                
+               <a href="{% url 'Post:profile' post.user %}">
+                <img width="25" height="40" src="{{ post.user.userprofile.profileimg.url }}" alt="avatar">
+                 
+                 
+                <div class="">
+                  <div class="chat-with">@{{post.user}}</div>
+                </div>
+              </a>
+              </div>
+              
+            </div>
+          
+         
+          <div id="">
+            <div class="body" style="padding-left: 20px; padding-right: 20px;">
+                {% if post.image %}
+                <a href="{% url 'Post:post_detail' pk=post.pk %}"><p style="color: black;">{{ post.content }}</p></a>
+              <img src="{{ post.image.url }}"  class="card-img-top img-fluid">
+              {% else %}
+              <a href="{% url 'Post:post_detail' pk=post.pk %}"><p style="color: black;">{{ post.content }}</p></a>
+              {% endif %}
+            </div>         
+            
+            <div class="card-footer chat-form d-flex justify-content-left">
+              <form class="like-form" data-post-id="{{ post.id }}">
+                {% csrf_token %}
+                {% if user.is_authenticated %}
+                  <div class="d-flex align-items-center">
+                    <button type="button" id="like-button" class="like-btn{% if request.user in post.likes.all %} liked{% endif %}">
+                      {% if request.user in post.likes.all %}
+                        <i class="fas fa-heart" style="color: #F44336;"></i>
+                      {% else %}
+                        <i class="far fa-heart"></i>
+                      {% endif %}
+                    </button>
+                    <span class="like-count ml-6">{{ post.likes.count }}</span>
+                  </div>
+                {% else %}
+                  <a href="{% url 'Users:signin' %}"><i class="far fa-heart"></i></a>
+                {% endif %}
+              </form>
+              <button data-post-content="{{ post.content }}" type="button" class="btn btn-link comment-btn" data-toggle="modal" data-target="#commentModal" data-post-id="{{ post.id }}" data-user-id="{{ post.user.id }}" class="ml-2" style="color: #65519e;"><i class="fas fa-comment fa-lg"></i>{{ post.comments.count }}</button>
+            </div>
+          </a>
+           
+    </div> 
+  </div>
+          </a>
+</div>                  
+
+</section>
+<div class="modal fade" id="commentModal" tabindex="-1" role="dialog" aria-labelledby="formModal"
+aria-hidden="true">
+<div class="modal-dialog" role="document">
+  <div class="modal-content">
+    <div class="modal-header">
+      
+      <i></i> <h4 style="color: violet;">Add Comment</h4>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+  
+      <div class="chat">
+        <div class="chat-header clearfix" style="font-size: 20px; padding: 8px;">
+         <a href="{% url 'Post:profile' post.user %}">
+          <img class="post-user-profile-img" width="25" height="40" src="{{ post.user.userprofile.profileimg.url }}" alt="avatar">
+          <div class="">
+            <div class="chat-with post-user-profile-username">@{{post.user}}</div>
+          </div>
+         </a>
+        </div>
+      </div>
+      <div class="body" style="padding-left: 20px; padding-right: 20px;">
+        <p class="post-content" style="color: black;">{{ post.content }}</p>Replying to <a href="{% url 'Post:profile' post.user %}">@{{ post.user }}</a>
+    </div>
+    <div class="chat">
+      <div class="chat-header clearfix" style="font-size: 20px; padding: 8px;">
+       <a href="{% url 'Post:profile' post.user %}">
+        <img class="comment-user-profile-img" width="25" height="40" src="{{ request.user.userprofile.profileimg.url }}" alt="avatar">
+        <div class="">
+          <div class="chat-with">@{{request.user.username }}</div>
+        </div>
+       </a>
+      </div>
+    </div>
+    <form action="{% url 'Post:create_comment' post.pk %}" enctype="multipart/form-data" method="POST">
+      {% csrf_token %} 
+
+      <div class="form-group">
+            
+        <textarea class="form-control" placeholder="Comment..." name="content" id="" cols="30" rows="10"></textarea>
+      
+            <div class="col-sm-12 col-md-7">
+              <button class="btn btn-primary" name="submit">Add Post</button>
+            </div>
+      </div>
+    </form>
+
+                </div>
+              </div>
+            </div>
+    </div>
+{% endfor %}
+</div> 
+
+           
+      <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="formModal"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            
+            <i></i> <h4 style="color: violet;">New Post</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form action="{% url 'Post:create_post' %}" enctype="multipart/form-data" method="POST">
+              {% csrf_token %} 
+
+              <div class="form-group">
+                    
+                <textarea class="form-control" placeholder="Content" name="content" id="" cols="30" rows="10"></textarea>
+              
+                <div>
+                    <input type="file" name="image">
+                  </div><br>
+                
+                          <div class="col-sm-12 col-md-7">
+                            <button class="btn btn-primary" name="submit">Add Post</button>
+                          </div>
+                        </div>
+            </form>
+                      </div>
+                    </div>
+                  </div>
+          </div>
+        </div>
+      </div>
+
+         
+              
+        
+        <div class="settingSidebar">
+          <a href="javascript:void(0)" class="settingPanelToggle"> <i class="fa fa-spin fa-cog"></i>
+          </a>
+          <div class="settingSidebar-body ps-container ps-theme-default">
+            <div class=" fade show active">
+              <div class="setting-panel-header">Setting Panel
+              </div>
+              <div class="p-15 border-bottom">
+                <h6 class="font-medium m-b-10">Select Layout</h6>
+                <div class="selectgroup layout-color w-50">
+                  <label class="selectgroup-item">
+                    <input type="radio" name="value" value="1" class="selectgroup-input-radio select-layout" checked>
+                    <span class="selectgroup-button">Light</span>
+                  </label>
+                  <label class="selectgroup-item">
+                    <input type="radio" name="value" value="2" class="selectgroup-input-radio select-layout">
+                    <span class="selectgroup-button">Dark</span>
+                  </label>
+                </div>
+              </div>
+              <div class="p-15 border-bottom">
+                <h6 class="font-medium m-b-10">Sidebar Color</h6>
+                <div class="selectgroup selectgroup-pills sidebar-color">
+                  <label class="selectgroup-item">
+                    <input type="radio" name="icon-input" value="1" class="selectgroup-input select-sidebar">
+                    <span class="selectgroup-button selectgroup-button-icon" data-toggle="tooltip"
+                      data-original-title="Light Sidebar"><i class="fas fa-sun"></i></span>
+                  </label>
+                  <label class="selectgroup-item">
+                    <input type="radio" name="icon-input" value="2" class="selectgroup-input select-sidebar" checked>
+                    <span class="selectgroup-button selectgroup-button-icon" data-toggle="tooltip"
+                      data-original-title="Dark Sidebar"><i class="fas fa-moon"></i></span>
+                  </label>
+                </div>
+              </div>
+              <div class="p-15 border-bottom">
+                <h6 class="font-medium m-b-10">Color Theme</h6>
+                <div class="theme-setting-options">
+                  <ul class="choose-theme list-unstyled mb-0">
+                    <li title="white" class="active">
+                      <div class="white"></div>
+                    </li>
+                    <li title="cyan">
+                      <div class="cyan"></div>
+                    </li>
+                    <li title="black">
+                      <div class="black"></div>
+                    </li>
+                    <li title="purple">
+                      <div class="purple"></div>
+                    </li>
+                    <li title="orange">
+                      <div class="orange"></div>
+                    </li>
+                    <li title="green">
+                      <div class="green"></div>
+                    </li>
+                    <li title="red">
+                      <div class="red"></div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="p-15 border-bottom">
+                <div class="theme-setting-options">
+                  <label class="m-b-0">
+                    <input type="checkbox" name="custom-switch-checkbox" class="custom-switch-input"
+                      id="mini_sidebar_setting">
+                    <span class="custom-switch-indicator"></span>
+                    <span class="control-label p-l-10">Mini Sidebar</span>
+                  </label>
+                </div>
+              </div>
+              <div class="p-15 border-bottom">
+                <div class="theme-setting-options">
+                  <label class="m-b-0">
+                    <input type="checkbox" name="custom-switch-checkbox" class="custom-switch-input"
+                      id="sticky_header_setting">
+                    <span class="custom-switch-indicator"></span>
+                    <span class="control-label p-l-10">Sticky Header</span>
+                  </label>
+                </div>
+              </div>
+              <div class="mt-4 mb-4 p-3 align-center rt-sidebar-last-ele">
+                <a href="#" class="btn btn-icon icon-left btn-primary btn-restore-theme">
+                  <i class="fas fa-undo"></i> Restore Default
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <footer class="main-footer">
+        <div class="footer-left">
+          <a href="templateshub.net">Templateshub</a></a>
+        </div>
+        <div class="footer-right">
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  {% block script %}
+
+  <script>
+    $(document).ready(function() {
+  // Handle comment button click
+  $('.comment-btn').click(function() {
+    var post_id = $(this).data('post-id'); // Get the post ID
+    var post = $('#post-' + post_id); // Find the post that corresponds to the clicked button
+    var user = post.find('.chat-with').text(); // Get the user who made the post
+    var userProfileImg = post.find('img').attr('src'); // Get the user's profile image
+    var postContent = $(this).data('post-content'); // Get the post content from the comment button data attribute
+    var user1 = '{{ request.user.username }}'; // Get the currently logged-in user
+    var userProfileImg1 = '{{ request.user.userprofile.profileimg.url }}'; // Get the user's profile image
+    var url = post.find('.chat-header1 a').attr('href'); // Get the profile URL
+    var post_user_profile_img = post.find('img').attr('src'); // Get the profile image of the user who made the post
+    var post_user_profile_username = post.find('.chat-with').text(); // Get the username of the user who made the post
+
+    $('#commentModal img.post-user-profile-img').attr('src', post_user_profile_img);
+    $('#commentModal .post-user-profile-username').text(post_user_profile_username);
+    $('#commentModal img.comment-user-profile-img').attr('src', userProfileImg1);
+    $('#commentModal .chat-with1').text(user1);
+    $('#commentModal .post-content').text(postContent); // Set the post content in the modal
+    $('#commentModal form').attr('action', '/posts/' + post_id + '/comment/'); // Set the form action
+  });
+});
+  </script>
+{% endblock %}
+  
+  <!-- General JS Scripts -->
+  <script src="{% static 'assets/js/app.min.js' %}"></script>
+  <!-- JS Libraies -->
+  <script src="{% static 'assets/bundles/prism/prism.js' %}"></script>
+  <script src="{% static 'assets/js/page/ion-icons.js' %}"></script>
+  <!-- Page Specific JS File -->
+  <!-- Template JS File -->
+  <script src="{% static 'assets/js/scripts.js' %}"></script>
+  <!-- Custom JS File -->
+  <script src="{% static 'assets/js/custom.js' %}"></script>
+</body>
+
+
+<!-- modal.html  21 Nov 2019 03:54:30 GMT -->
+</html>

@@ -1,0 +1,62 @@
+{% extends 'Post/base.html' %}
+
+
+{% block content %}
+  <div class="container">
+    <div class="">
+      <div class="col-md-8">
+        <div class="card mb-4">
+          <div class="card-body">
+            <div class="chat">
+              <div class="chat-header clearfix" style="font-size: 20px; padding: 8px;">
+                
+               <a href="{% url 'Post:profile' post.user %}">
+                <img width="25" height="40" src="{{ post.user.userprofile.profileimg.url }}" alt="avatar">
+                 
+                 
+                <div class="">
+                  <div class="chat-with">@{{post.user}}</div>
+                </div>
+              </a>
+              </div>
+              
+            </div>
+            <h5 class="card-title">{{ post.title }}</h5>
+            <p class="card-text">{{ post.content }}</p>
+
+           
+            <form method="POST" action="{% url 'Post:post_detail' pk=post.pk %}">
+              {% csrf_token %}
+              <div class="form-group">
+                <textarea name="content" class="form-control"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">Post Comment</button>
+            </form><br>
+            <h5 class="card-title">Comments</h5>
+          <div id="comments">
+            {% for comment in comments %}
+              <div class="media mb-3">
+                <div class="media-body">
+                  <div class="chat">
+                    <div class="chat-header clearfix" style="font-size: 20px; padding: 8px;">
+                     <a href="{% url 'Post:profile' post.user %}">
+                      <img class="comment-user-profile-img" width="25" height="40" src="{{ comment.user.userprofile.profileimg.url }}" alt="avatar">
+                      <div class="">
+                        <div class="chat-with">@{{comment.user.username }}</div>
+                      </div>
+                     </a>
+                    </div>
+                  </div>
+                  <p>{{ comment.content }}</p>
+                </div>
+              </div>
+            {% empty %}
+              <p>No comments yet.</p>
+            {% endfor %}
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
