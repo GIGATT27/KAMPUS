@@ -45,6 +45,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -79,8 +80,12 @@ WSGI_APPLICATION = 'UniVerse.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'universe_db',
+            'USER': 'postgres',
+            'PASSWORD': '',
+            'HOST': '127.0.0.1',
+            'PORT': '5431',
     }
 }
 
@@ -122,6 +127,8 @@ USE_TZ = True
 LOGIN_REDIRECT_URL = ''
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR/'assets'
+STATICFILES_STORAGE = 'whitenoise.storage.Compressed.ManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 LOGIN_URL = 'Users:signin'
 
